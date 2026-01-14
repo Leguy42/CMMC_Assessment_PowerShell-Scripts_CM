@@ -1,0 +1,18 @@
+# Enumerate all shares and permissions
+Get-SmbShare | Where-Object {$_.Name -notlike "*$"} | ForEach-Object {
+    $shareName = $_.Name
+    $shareAccess = Get-SmbShareAccess -Name $shareName
+    
+    foreach($access in $shareAccess){
+        [PSCustomObject]@{
+            ShareName = $shareName
+            AccountName = $access.AccountName
+            AccessControlType = $access.AccessControlType
+            AccessRight = $access.AccessRight
+        }
+    }
+} | Export-Csv -Path "C:\Temp\SharePermissions.csv" -NoTypeInformation
+
+# Check administrative shares configuration
+Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" |
+    Select-Object AutoShareWks, AutoShareServer | Format-List
