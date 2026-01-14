@@ -1,0 +1,17 @@
+# List all running services
+Get-Service | Where-Object {$_.Status -eq "Running"} | 
+    Select-Object Name, DisplayName, StartType, Status |
+    Sort-Object DisplayName |
+    Export-Csv -Path "C:\Temp\RunningServices.csv" -NoTypeInformation
+
+# List all listening ports with associated processes
+Get-NetTCPConnection -State Listen | 
+    Select-Object LocalAddress, LocalPort, State, 
+    @{Name='Process';Expression={(Get-Process -Id $_.OwningProcess).ProcessName}} |
+    Sort-Object LocalPort |
+    Export-Csv -Path "C:\Temp\ListeningPorts.csv" -NoTypeInformation
+
+# Check for unnecessary protocols
+Get-WindowsOptionalFeature -Online | Where-Object {$_.State -eq "Enabled"} |
+    Select-Object FeatureName, State |
+    Export-Csv -Path "C:\Temp\EnabledFeatures.csv" -NoTypeInformation
