@@ -1,0 +1,25 @@
+# Export local security policy
+secedit /export /cfg "C:\Temp\LocalSecurityPolicy.inf"
+
+# Check key security settings
+$settings = @{
+    'Password Policy' = @(
+        'MinimumPasswordLength',
+        'PasswordComplexity',
+        'MaximumPasswordAge',
+        'MinimumPasswordAge'
+    )
+    'Account Lockout' = @(
+        'LockoutBadCount',
+        'LockoutDuration',
+        'ResetLockoutCount'
+    )
+}
+
+# Get current password policy
+net accounts | Out-File "C:\Temp\PasswordPolicy.txt"
+
+# Check Windows Firewall status
+Get-NetFirewallProfile | Select-Object Name, Enabled, 
+    DefaultInboundAction, DefaultOutboundAction | 
+    Format-Table -AutoSize
